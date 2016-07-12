@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<constant name="struts.devMode" value="true" />
+	<constant name="struts.multipart.maxSize" value="1073741824" /> <!-- 1GB = 1 * 1024 * 1024 * 1024 Bytes -->
+
+	<constant name="struts.enable.SlashesInActionNames" value="true" />
+	<constant name="struts.mapper.alwaysSelectFullNamespace"
+		value="false" />
+	<constant name="struts.mapper.action.prefix.enabled" value="true" />
+
+	<package name="default" namespace="/" extends="struts-default">
+
+		<result-types>
+			<result-type name="json" class="org.apache.struts2.json.JSONResult" />
+		</result-types>
+		<interceptors>
+			<interceptor-stack name="appDefaultStack">
+				<interceptor-ref name="defaultStack">
+					<param name="exception.logEnabled">true</param>
+					<param name="exception.logLevel">ERROR</param>
+					<param name="params.excludeParams">dojo\..*,^struts\..*,^session\..*,^request\..*,^application\..*,^servlet(Request|Response)\..*,parameters\...*</param>
+				</interceptor-ref>
+			</interceptor-stack>
+		</interceptors>
+
+		<default-interceptor-ref name="appDefaultStack" />
+
+		<global-results>
+			<result name="exception">/WEB-INF/jsp/error.jsp</result>
+			<result name="runtime_exception">/WEB-INF/jsp/error.jsp</result>
+			<result name="error">/WEB-INF/jsp/error.jsp</result>
+		</global-results>
+
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="exception"></exception-mapping>
+			<exception-mapping exception="java.lang.Error"
+				result="error"></exception-mapping>
+			<exception-mapping exception="java.lang.RuntimeException"
+				result="runtime_exception"></exception-mapping>
+		</global-exception-mappings>
+
+		<!-- First action to be triggered for the application -->
+		<action name="main" class="com.ten.struts2.actions.MainAction"
+			method="execute">
+			<result name="success">/WEB-INF/jsp/main.jsp</result>
+			<result name="input">/WEB-INF/jsp/main.jsp</result>
+		</action>
+
+		<action name="logout" class="com.ten.struts2.actions.LogoutAction"
+			method="execute">
+			<result name="success">/WEB-INF/jsp/logout.jsp</result>
+			<result name="input">/WEB-INF/jsp/logout.jsp</result>
+		</action>
+
+		<!-- Action for handling new user signup -->
+		<action name="login/signup" class="com.ten.struts2.actions.SignUpAction"
+			method="execute">
+			<result name="success">/WEB-INF/jsp/signup.jsp</result>
+			<result name="input">/WEB-INF/jsp/signup.jsp</result>
+			<result name="showjsp">/WEB-INF/jsp/signup.jsp</result>
+		</action>
+
+		<!-- Action for handling upload & digital rights management process of 
+			image -->
+		<action name="upload/uploadimage" class="com.ten.struts2.actions.UploadImageAction"
+			method="execute">
+			<interceptor-ref name="appDefaultStack">
+				<param name="fileUpload.maximumSize">5000000</param>
+				<param name="fileUpload.allowedTypes">image/jpeg,image/gif,image/jpg,image/png,image/bmp</param>
+			</interceptor-ref>
+			<result name="success">/WEB-INF/jsp/upload_image.jsp</result>
+			<result name="input">/WEB-INF/jsp/upload_image.jsp</result>
+			<result name="showjsp">/WEB-INF/jsp/upload_image.jsp</result>
+		</action>
+
+		<action name="annotate/annotateimagemain" class="com.ten.struts2.actions.AnnotateImageMainAction"
+			method="execute">
+			<result name="success">/WEB-INF/jsp/annotate_image_main.jsp</result>
+			<result name="input">/WEB-INF/jsp/annotate_image_main.jsp</result>
+			<result name="showjsp">/WEB-INF/jsp/annotate_image_main.jsp</result>
+		</action>
+
+		<action name="annotate/annotateimage" class="com.ten.struts2.actions.AnnotateImageAction"
+			method="execute">
+			<result name="success">/WEB-INF/jsp/annotate_image.jsp</result>
+			<result name="input">/WEB-INF/jsp/annotate_image.jsp</result>
+			<result name="showjsp">/WEB-INF/jsp/annotate_image.jsp</result>
+		</action>
+
+		<!-- Action for handling upload & annotation process of video -->
+		<action name="upload/uploadvideo" class="com.ten.struts2.actions.UploadVideoAction"
+			method="execute">
+			<interceptor-ref name="appDefaultStack">
+				<!-- Restricting single file to 500MB -->
+				<param name="fileUpload.maximumSize">524288000</param>
+				<param name="fileUpload.allowedTypes">video/mp4,video/webm,video/ogg</param>
+			</interceptor-ref>
+			<result name="success">/WEB-INF/jsp/upload_video.jsp</result>
+			<result name="input">/WEB-INF/jsp/upload_video.jsp</result>
+			<result name="showjsp">/WEB-INF/jsp/upload_video.jsp</result>
+		</action>
+
+		<action name="annotate/annotatevideomain" class="com.ten.struts2.actions.AnnotateVideoMainAction"
+			method="execute">
+			<result name="success">/WEB-INF/jsp/annotate_video_main.jsp</result>
+			<result name="input">/WEB-INF/jsp/annotate_video_main.jsp</result>
+			<result name="showjsp">/WEB-INF/jsp/annotate_video_main.jsp</result>
+		</action>
+
+		<action name="annotate/annotatevideo" class="com.ten.struts2.actions.AnnotateVideoAction"
+			method="execute">
+			<result name="success">/WEB-INF/jsp/annotate_video.jsp</result>
+			<result name="input">/WEB-INF/jsp/annotate_video.jsp</result>
+			<result name="showjsp">/WEB-INF/jsp/annotate_video.jsp</result>
+		</action>
+
+		<!-- Action for handling upload & annotation process of text -->
+		<action name="upload/uploadtext" class="com.ten.struts2.actions.UploadTextAction"
+			method="execute">
+			<interceptor-ref name="appDefaultStack">
+				<param name="fileUpload.maximumSize">5000000</param>
+				<param name="fileUpload.allowedTypes">text/plain, application/pdf, application/msword,
+					application/vnd.openxmlformats-officedocument.wordprocessingml.document</param>
+			</interceptor-ref>
+			<result name="success">/WEB-INF/jsp/upload_text.jsp</result>
+			<result name="input">/WEB-INF/jsp/upload_text.jsp</result>
+			<result name="showjsp">/WEB-INF/jsp/upload_text.jsp</result>
+		</action>
+
+		<action name="annotate/annotatetextmain" class="com.ten.struts2.actions.AnnotateTextMainAction"
+			method="execute">
+			<result name="success">/WEB-INF/jsp/annotate_text_main.jsp</result>
+			<result name="input">/WEB-INF/jsp/annotate_text_main.jsp</result>
+			<result name="showjsp">/WEB-INF/jsp/annotate_text_main.jsp</result>
+		</action>
+
+		<action name="annotate/annotatetext" class="com.ten.struts2.actions.AnnotateTextAction"
+			method="execute">
+			<result name="success">/WEB-INF/jsp/annotate_text.jsp</result>
+			<result name="input">/WEB-INF/jsp/annotate_text.jsp</result>
+			<result name="showjsp">/WEB-INF/jsp/annotate_text.jsp</result>
+		</action>
+
+		<!-- Action for handling upload & annotation process of audio -->
+		<action name="upload/uploadaudio" class="com.ten.struts2.actions.UploadAudioAction"
+			method="execute">
+			<interceptor-ref name="appDefaultStack">
+				<param name="fileUpload.maximumSize">5000000</param>
+				<param name="fileUpload.allowedTypes">audio/mpeg,audio/ogg,audio/wav</param>
+			</interceptor-ref>
+			<result name="success">/WEB-INF/jsp/upload_audio.jsp</result>
+			<result name="input">/WEB-INF/jsp/upload_audio.jsp</result>
+			<result name="showjsp">/WEB-INF/jsp/upload_audio.jsp</result>
+		</action>
+
+		<action name="annotate/annotateaudiomain" class="com.ten.struts2.actions.AnnotateAudioMainAction"
+			method="execute">
+			<result name="success">/WEB-INF/jsp/annotate_audio_main.jsp</result>
+			<result name="input">/WEB-INF/jsp/annotate_audio_main.jsp</result>
+			<result name="showjsp">/WEB-INF/jsp/annotate_audio_main.jsp</result>
+		</action>
+
+		<action name="annotate/annotateaudio" class="com.ten.struts2.actions.AnnotateAudioAction"
+			method="execute">
+			<result name="success">/WEB-INF/jsp/annotate_audio.jsp</result>
+			<result name="input">/WEB-INF/jsp/annotate_audio.jsp</result>
+			<result name="showjsp">/WEB-INF/jsp/annotate_audio.jsp</result>
+		</action>
+
+		<!-- Action for handling listing cultural learning objects -->
+		<action name="view/culturallearningobjects"
+			class="com.ten.struts2.actions.ViewExistingCulturalLearningObjectsAction"
+			method="execute">
+			<result name="success">/WEB-INF/jsp/view_cultural_learning_objects.jsp
+			</result>
+			<result name="input">/WEB-INF/jsp/view_cultural_learning_objects.jsp
+			</result>
+			<result name="showjsp">/WEB-INF/jsp/view_cultural_learning_objects.jsp
+			</result>
+		</action>
+
+		<!-- Action for updating digital rights management -->
+		<action name="view/culturallearningobjects/digitalrightsmanagement"
+			class="com.ten.struts2.actions.UpdateDigitalRightsManagementAction"
+			method="execute">
+			<result name="success">/WEB-INF/jsp/update_digital_rights_management.jsp
+			</result>
+			<result name="input">/WEB-INF/jsp/update_digital_rights_management.jsp
+			</result>
+			<result name="showjsp">/WEB-INF/jsp/update_digital_rights_management.jsp
+			</result>
+		</action>
+
+		<!-- Action for handling course related functionality -->
+		<action name="course/create" class="com.ten.struts2.actions.CreateCourseAction"
+			method="execute">
+			<result name="success" type="redirectAction">
+				<param name="actionName">course/searchlearningobjects</param>
+				<!-- <param name="typeOfLearningObject">Image</param> -->
+				<param name="keywords">${courseAnnotationsBean.keywords}</param>
+			</result>
+			<result name="input">/WEB-INF/jsp/create_course.jsp</result>
+			<result name="showjsp">/WEB-INF/jsp/create_course.jsp</result>
+		</action>
+
+		<action name="courses/manage" class="com.ten.struts2.actions.ManageCoursesAction"
+			method="execute">
+			<result name="success">/WEB-INF/jsp/manage_courses.jsp</result>
+			<result name="input">/WEB-INF/jsp/manage_courses.jsp</result>
+			<result name="showjsp">/WEB-INF/jsp/manage_courses.jsp</result>
+		</action>
+
+		<action name="courses/manage/coursedetails"
+			class="com.ten.struts2.actions.ManageCourseDetailsAction" method="execute">
+			<result name="success">/WEB-INF/jsp/manage_course_details.jsp</result>
+			<result name="input">/WEB-INF/jsp/manage_course_details.jsp</result>
+			<result name="showjsp">/WEB-INF/jsp/manage_course_details.jsp</result>
+			<result name="delete">/WEB-INF/jsp/main.jsp</result>
+			<result name="downloadCourse" type="stream">
+				<param name="contentType">application/octet-stream</param>
+				<param name="inputName">fileInputStream</param>
+				<param name="contentDisposition">attachment;filename="course.zip"</param>
+				<param name="bufferSize">4096</param>
+			</result>
+		</action>
+
+		<action name="course/searchlearningobjects"
+			class="com.ten.struts2.actions.SearchLearningObjectsAction" method="execute">
+			<result name="success">/WEB-INF/jsp/add_learning_objects.jsp</result>
+			<result name="input">/WEB-INF/jsp/add_learning_objects.jsp</result>
+			<result name="showjsp">/WEB-INF/jsp/add_learning_objects.jsp</result>
+		</action>
+
+		<action name="view/courses" class="com.ten.struts2.actions.ViewCoursesAction"
+			method="execute">
+			<result name="success">/WEB-INF/jsp/view_courses_main.jsp</result>
+			<result name="input">/WEB-INF/jsp/view_courses_main.jsp</result>
+			<result name="showjsp">/WEB-INF/jsp/view_courses_main.jsp</result>
+		</action>
+
+		<action name="view/coursedetails" class="com.ten.struts2.actions.ViewCourseDetailsAction"
+			method="execute">
+			<result name="success">/WEB-INF/jsp/course_details.jsp</result>
+			<result name="input">/WEB-INF/jsp/course_details.jsp</result>
+			<result name="showjsp">/WEB-INF/jsp/course_details.jsp</result>
+		</action>
+
+		<!-- Mapping for action URL from CLOs or RCLOs href from course_details.jsp -->
+		<action name="view/coursedetails/videopresentation">
+			<result>/WEB-INF/jsp/video_presentation.jsp</result>
+		</action>
+
+		<!-- Another action for detect shots "view/coursedetails/videopresentation/shotdetection" -->
+
+		<action name="view/profiledetails" class="com.ten.struts2.actions.ProfileDetailsAction"
+			method="execute">
+			<result name="success">/WEB-INF/jsp/profile_details.jsp</result>
+			<result name="input">/WEB-INF/jsp/profile_details.jsp</result>
+			<result name="showjsp">/WEB-INF/jsp/profile_details.jsp</result>
+		</action>
+
+		<action name="view/coursedetails/videopresentation/shotdetection"
+			class="com.ten.struts2.actions.VideoShotAction">
+
+			<!-- try this request is sent but server doesn't respond with pages. But 
+				check whether content works like accessing class variables etc. -->
+			<result type="json"></result>
+
+			<!-- <result name="samepage" type="httpheader"></result> -->
+			<!-- <result name="input">/WEB-INF/jsp/video_presentation.jsp</result> -->
+		</action>
+
+		<!-- Action for updating digital rights management -->
+		<action name="view/culturallearningobjects/digitalrightsmanagement"
+			class="com.ten.struts2.actions.UpdateDigitalRightsManagementAction"
+			method="execute">
+			<result name="success">/WEB-INF/jsp/update_digital_rights_management.jsp
+			</result>
+			<result name="input">/WEB-INF/jsp/update_digital_rights_management.jsp
+			</result>
+			<result name="showjsp">/WEB-INF/jsp/update_digital_rights_management.jsp
+			</result>
+		</action>
+
+
+
+	</package>
+
+	<!-- <package name="default" namespace="/" extends="json-default"> <interceptors> 
+		<interceptor-stack name="mystack"> <interceptor-ref name="defaultStack"/> 
+		<interceptor-ref name="json"> <param name="enableSMD">true</param> </interceptor-ref> 
+		</interceptor-stack> </interceptors> <action name="view/coursedetails/videopresentation/shotdetection" 
+		class="com.ten.struts2.actions.VideoShotAction"> <result type="json" /> </action> 
+		</package> -->
+
+
+</struts>

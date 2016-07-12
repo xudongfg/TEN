@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	id="WebApp_ID" metadata-complete="true" version="3.0">
+	<display-name>TribalEducationNetwork</display-name>
+	<welcome-file-list>
+		<welcome-file>/index.jsp</welcome-file>
+	</welcome-file-list>
+	<servlet>
+		<servlet-name>Log4JInitServlet</servlet-name>
+		<servlet-class>com.ten.servlets.Log4JInitServlet</servlet-class>
+		<init-param>
+			<param-name>log4j-properties-location</param-name>
+			<param-value>WEB-INF/log4j.properties</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<filter>
+		<filter-name>struts2</filter-name>
+		<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>struts2</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Any url access is protected</web-resource-name>
+			<url-pattern>/*</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>Intaker</role-name>
+			<role-name>Annotator</role-name>
+			<role-name>Creator</role-name>
+			<role-name>Student</role-name>
+			<role-name>Admin</role-name>
+			<role-name>mentor</role-name>
+		</auth-constraint>
+	</security-constraint>
+	<security-constraint>
+		<display-name>upload security constraint</display-name>
+		<web-resource-collection>
+			<web-resource-name>Protected Area</web-resource-name>
+			<url-pattern>/upload/*</url-pattern>
+			<http-method>DELETE</http-method>
+			<http-method>GET</http-method>
+			<http-method>POST</http-method>
+			<http-method>PUT</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>Intaker</role-name>
+			<role-name>Annotator</role-name>
+			<role-name>Admin</role-name>
+		</auth-constraint>
+		<user-data-constraint>
+			<transport-guarantee>NONE</transport-guarantee>
+		</user-data-constraint>
+	</security-constraint>
+	<security-constraint>
+		<display-name>annotate security constraint</display-name>
+		<web-resource-collection>
+			<web-resource-name>Protected Area</web-resource-name>
+			<url-pattern>/annotate/*</url-pattern>
+			<http-method>DELETE</http-method>
+			<http-method>GET</http-method>
+			<http-method>POST</http-method>
+			<http-method>PUT</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>Annotator</role-name>
+			<role-name>Admin</role-name>
+		</auth-constraint>
+		<user-data-constraint>
+			<transport-guarantee>NONE</transport-guarantee>
+		</user-data-constraint>
+	</security-constraint>
+	<security-constraint>
+		<display-name>course security constraint</display-name>
+		<web-resource-collection>
+			<web-resource-name>Protected Area</web-resource-name>
+			<url-pattern>/course/*</url-pattern>
+			<http-method>DELETE</http-method>
+			<http-method>GET</http-method>
+			<http-method>POST</http-method>
+			<http-method>PUT</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>Creator</role-name>
+			<role-name>Admin</role-name>
+		</auth-constraint>
+		<user-data-constraint>
+			<transport-guarantee>NONE</transport-guarantee>
+		</user-data-constraint>
+	</security-constraint>
+	<security-constraint>
+		<display-name>course security constraint</display-name>
+		<web-resource-collection>
+			<web-resource-name>Protected Area</web-resource-name>
+			<url-pattern>/view/*</url-pattern>
+			<http-method>DELETE</http-method>
+			<http-method>GET</http-method>
+			<http-method>POST</http-method>
+			<http-method>PUT</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>Student</role-name>
+			<role-name>Intaker</role-name>
+			<role-name>Admin</role-name>
+		</auth-constraint>
+		<user-data-constraint>
+			<transport-guarantee>NONE</transport-guarantee>
+		</user-data-constraint>
+	</security-constraint>
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Public</web-resource-name>
+			<description>Matches a few special pages.</description>
+			<url-pattern>/images/*</url-pattern>
+			<url-pattern>/css/*</url-pattern>
+			<url-pattern>/login/*</url-pattern>
+			<url-pattern>/login/signup</url-pattern>
+			<url-pattern>/login/signup.action</url-pattern>
+			<url-pattern>/about_ten.html</url-pattern>
+			<url-pattern>/signup.jsp</url-pattern>
+			<url-pattern>/ten</url-pattern>
+		</web-resource-collection>
+	</security-constraint>
+	<login-config>
+		<auth-method>FORM</auth-method>
+		<realm-name>Example Form-Based Authentication Area</realm-name>
+		<form-login-config>
+			<form-login-page>/WEB-INF/jsp/login.jsp</form-login-page>
+			<form-error-page>/WEB-INF/jsp/login_failed.jsp</form-error-page>
+		</form-login-config>
+	</login-config>
+	<security-role>
+		<description> A Digital rights management Intaker </description>
+		<role-name>Intaker</role-name>
+	</security-role>
+	<security-role>
+		<description> Annotator of digital content </description>
+		<role-name>Annotator</role-name>
+	</security-role>
+	<security-role>
+		<description> Course Creator </description>
+		<role-name>Creator</role-name>
+	</security-role>
+	<security-role>
+		<description> Student </description>
+		<role-name>Student</role-name>
+	</security-role>
+	<security-role>
+		<description> mentor </description>
+		<role-name>mentor</role-name>
+	</security-role>
+	<session-config>
+		<session-timeout>30</session-timeout>
+	</session-config>
+	<resource-ref>
+		<description>DB Connection</description>
+		<res-ref-name>jdbc/TenDB</res-ref-name>
+		<res-type>javax.sql.DataSource</res-type>
+		<res-auth>Container</res-auth>
+	</resource-ref>
+</web-app>
