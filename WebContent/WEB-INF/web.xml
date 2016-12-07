@@ -107,6 +107,7 @@
 			<role-name>Student</role-name>
 			<role-name>Intaker</role-name>
 			<role-name>Admin</role-name>
+			<role-name>Annotator</role-name>
 		</auth-constraint>
 		<user-data-constraint>
 			<transport-guarantee>NONE</transport-guarantee>
