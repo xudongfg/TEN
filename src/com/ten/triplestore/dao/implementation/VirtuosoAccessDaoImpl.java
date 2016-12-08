@@ -1,5 +1,7 @@
 package com.ten.triplestore.dao.implementation;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +35,13 @@ import com.ten.beans.StudentAnnotationsBean;
 import com.ten.beans.TenLearningObjectAnnotationsBean;
 import com.ten.triplestore.dao.interfaces.TriplestoreAccessDaoInterface;
 import com.ten.utils.Utils;
+
+import edu.mit.jwi.Dictionary;
+import edu.mit.jwi.IDictionary;
+import edu.mit.jwi.item.IIndexWord;
+import edu.mit.jwi.item.IWord;
+import edu.mit.jwi.item.IWordID;
+import edu.mit.jwi.item.POS;
 
 /**
  * @author Nita Karande
@@ -1664,6 +1673,31 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
 		return tripleList;
 	}
 
+	public void testDictionary(String keyword) throws IOException {
+    	// construct the URL to the Wordnet dictionary directory
+//    	String wnhome = System.getenv (" WNHOME ");
+//    	String path = wnhome + File.separator + "dict";
+    	String path = "C:\\TEN\\workspace\\TribalEducationNetwork\\WebContent\\WNdb-3.0\\dict";
+    	System.out.println ("WNDB path is " + path );
+    	URL url = new URL("file", null , path );
+    	System.out.println ("Get dic file url.");
+    	// construct the dictionary object and open it
+    	IDictionary dict = new Dictionary (url);
+    	System.out.println("Initial iDic.");
+    	dict.open();
+    	System.out.println("Open iDic.");
+
+    	// look up first sense of the word "dog "
+    	IIndexWord idxWord = dict.getIndexWord(keyword, POS.NOUN );
+    	System.out.println("Index word set.");
+    	IWordID wordID = idxWord.getWordIDs().get(0) ;
+    	System.out.println("Word id find.");
+    	IWord word = dict.getWord(wordID);
+    	System.out.println("Id = " + wordID );
+    	System.out.println(" Lemma = " + word.getLemma ());
+    	System.out.println(" Gloss = " + word.getSynset().getGloss());
+    }
+	
 	@Override
 	public HashMap<String, TenLearningObjectAnnotationsBean> searchLearningObjects(
 			String type, String keywords, String andSearchTerms) throws Exception {
@@ -1685,8 +1719,12 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
 			ArrayList<String> orSearchTerms = new ArrayList<String>();
 			StringTokenizer st = new StringTokenizer(keywords);
 			while (st.hasMoreTokens()) {
-				orSearchTerms.add(st.nextToken().trim());
+				String nextKeyword = st.nextToken().trim();
+				orSearchTerms.add(nextKeyword);
+//				Test JWI search
+				testDictionary(nextKeyword);
 			}
+			
 			
 			ArrayList<String> andSearchTermsList = new ArrayList<String>();
 			StringTokenizer andSt = new StringTokenizer(andSearchTerms);

@@ -169,30 +169,7 @@ public class SearchLearningObjectsAction extends ActionSupport implements Sessio
 		this.learningObjectsSearchResults = null;
 	}
 
-    public void testDictionary () throws IOException {
-    	// construct the URL to the Wordnet dictionary directory
-//    	String wnhome = System.getenv (" WNHOME ");
-//    	String path = wnhome + File.separator + "dict";
-    	String path = "C:\\TEN\\workspace\\TribalEducationNetwork\\WebContent\\WNdb-3.0\\dict";
-    	System.out.println ("WNDB path is " + path );
-    	URL url = new URL("file", null , path );
-    	System.out.println ("Get dic file url.");
-    	// construct the dictionary object and open it
-    	IDictionary dict = new Dictionary (url);
-    	System.out.println("Initial iDic.");
-    	dict.open();
-    	System.out.println("Open iDic.");
-
-    	// look up first sense of the word "dog "
-    	IIndexWord idxWord = dict.getIndexWord("dog", POS.NOUN );
-    	System.out.println("Index word set.");
-    	IWordID wordID = idxWord.getWordIDs().get(0) ;
-    	System.out.println("Word id find.");
-    	IWord word = dict.getWord(wordID);
-    	System.out.println("Id = " + wordID );
-    	System.out.println(" Lemma = " + word.getLemma ());
-    	System.out.println(" Gloss = " + word.getSynset().getGloss());
-    }
+    
     
     protected Map<Integer, LearningObjectDetailsBean> searchLearningObjects(String keywords, String typeOfLearningObject, CourseBean course) throws Exception {
         if (keywords == null || keywords.isEmpty() || typeOfLearningObject == null || typeOfLearningObject.isEmpty()) {
@@ -205,7 +182,7 @@ public class SearchLearningObjectsAction extends ActionSupport implements Sessio
 //        if (keywords.equals("ocean")) {
 //        	keywords = "sea";
 //        }
-        testDictionary ();
+//        testDictionary ();
         
         HashMap<String,TenLearningObjectAnnotationsBean> mapLearningObjects = tdbAccessDaoInterface.searchLearningObjects(typeOfLearningObject, keywords, "");
         
