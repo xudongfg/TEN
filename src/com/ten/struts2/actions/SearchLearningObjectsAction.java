@@ -1,6 +1,9 @@
 package com.ten.struts2.actions;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.Exception;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,6 +27,13 @@ import com.ten.dao.implementation.DbAccessDaoImpl;
 import com.ten.dao.interfaces.DbAccessDaoInterface;
 import com.ten.triplestore.dao.implementation.VirtuosoAccessDaoImpl;
 import com.ten.triplestore.dao.interfaces.TriplestoreAccessDaoInterface;
+
+import edu.mit.jwi.Dictionary;
+import edu.mit.jwi.IDictionary;
+import edu.mit.jwi.item.IIndexWord;
+import edu.mit.jwi.item.IWord;
+import edu.mit.jwi.item.IWordID;
+import edu.mit.jwi.item.POS;
 
 /**
  * 
@@ -158,6 +168,31 @@ public class SearchLearningObjectsAction extends ActionSupport implements Sessio
     public void reset(){
 		this.learningObjectsSearchResults = null;
 	}
+
+    public void testDictionary () throws IOException {
+    	// construct the URL to the Wordnet dictionary directory
+//    	String wnhome = System.getenv (" WNHOME ");
+//    	String path = wnhome + File.separator + "dict";
+    	String path = "C:\\TEN\\workspace\\TribalEducationNetwork\\WebContent\\WNdb-3.0\\dict";
+    	System.out.println ("WNDB path is " + path );
+    	URL url = new URL("file", null , path );
+    	System.out.println ("Get dic file url.");
+    	// construct the dictionary object and open it
+    	IDictionary dict = new Dictionary (url);
+    	System.out.println("Initial iDic.");
+    	dict.open();
+    	System.out.println("Open iDic.");
+
+    	// look up first sense of the word "dog "
+    	IIndexWord idxWord = dict.getIndexWord("dog", POS.NOUN );
+    	System.out.println("Index word set.");
+    	IWordID wordID = idxWord.getWordIDs().get(0) ;
+    	System.out.println("Word id find.");
+    	IWord word = dict.getWord(wordID);
+    	System.out.println("Id = " + wordID );
+    	System.out.println(" Lemma = " + word.getLemma ());
+    	System.out.println(" Gloss = " + word.getSynset().getGloss());
+    }
     
     protected Map<Integer, LearningObjectDetailsBean> searchLearningObjects(String keywords, String typeOfLearningObject, CourseBean course) throws Exception {
         if (keywords == null || keywords.isEmpty() || typeOfLearningObject == null || typeOfLearningObject.isEmpty()) {
@@ -165,6 +200,13 @@ public class SearchLearningObjectsAction extends ActionSupport implements Sessio
         }
         // search learning objects in triple store
         TriplestoreAccessDaoInterface tdbAccessDaoInterface = new VirtuosoAccessDaoImpl();
+        
+        //Play with keyword to see whether finding semantic keyword works.
+//        if (keywords.equals("ocean")) {
+//        	keywords = "sea";
+//        }
+        testDictionary ();
+        
         HashMap<String,TenLearningObjectAnnotationsBean> mapLearningObjects = tdbAccessDaoInterface.searchLearningObjects(typeOfLearningObject, keywords, "");
         
         // get learning object details
