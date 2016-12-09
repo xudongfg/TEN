@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
+
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -39,9 +41,12 @@ import com.ten.utils.Utils;
 import edu.mit.jwi.Dictionary;
 import edu.mit.jwi.IDictionary;
 import edu.mit.jwi.item.IIndexWord;
+import edu.mit.jwi.item.ISynset;
+import edu.mit.jwi.item.ISynsetID;
 import edu.mit.jwi.item.IWord;
 import edu.mit.jwi.item.IWordID;
 import edu.mit.jwi.item.POS;
+import edu.mit.jwi.item.Pointer;
 
 /**
  * @author Nita Karande
@@ -1680,23 +1685,55 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
     	String path = "C:\\TEN\\workspace\\TribalEducationNetwork\\WebContent\\WNdb-3.0\\dict";
     	System.out.println ("WNDB path is " + path );
     	URL url = new URL("file", null , path );
-    	System.out.println ("Get dic file url.");
     	// construct the dictionary object and open it
     	IDictionary dict = new Dictionary (url);
-    	System.out.println("Initial iDic.");
     	dict.open();
-    	System.out.println("Open iDic.");
 
     	// look up first sense of the word "dog "
     	IIndexWord idxWord = dict.getIndexWord(keyword, POS.NOUN );
-    	System.out.println("Index word set.");
     	IWordID wordID = idxWord.getWordIDs().get(0) ;
-    	System.out.println("Word id find.");
     	IWord word = dict.getWord(wordID);
     	System.out.println("Id = " + wordID );
-    	System.out.println(" Lemma = " + word.getLemma ());
-    	System.out.println(" Gloss = " + word.getSynset().getGloss());
+    	List<IWordID> relatedWords = word.getRelatedWords();
+    	for(IWordID wid : relatedWords){
+    		IWord eachWord = dict.getWord(wid);
+    		System.out.println(eachWord.getLemma());
+    	}
+    	
+    	ISynset synset = word.getSynset();
+    	getHypernyms(dict, synset);
+    	getSynonyms(synset);
+    	
+//    	for(IWord w : synset.getWords()){
+//    		System.out.println(w.getLemma());
+//    	}
+//    	System.out.println(" Lemma = " + word.getLemma ());
+//    	System.out.println(" Gloss = " + word.getSynset().getGloss());
     }
+	
+	public void getSynonyms(ISynset synset){
+		for(IWord w : synset.getWords()){
+    		System.out.println(w.getLemma());
+    	}
+	}
+	
+	public void getHypernyms(IDictionary dict, ISynset synset){
+//		get the hypernyms
+		List<ISynsetID> hypernyms = synset.getRelatedSynsets();
+//		List<ISynsetID> hypernyms = synset.getRelatedSynsets(Pointer.HYPERNYM);
+//		print out each hypernyms id and synonyms
+		List <IWord> words;
+		for(ISynsetID sid : hypernyms){
+			words = dict.getSynset(sid).getWords();
+			System.out.print(sid + " {");
+			for(Iterator<IWord> i = words.iterator(); i.hasNext();){
+				System.out.print(i.next().getLemma());
+				if(i.hasNext())
+					System.out.print(", ");
+			}
+			System.out.println("}");
+		}
+	}
 	
 	@Override
 	public HashMap<String, TenLearningObjectAnnotationsBean> searchLearningObjects(
