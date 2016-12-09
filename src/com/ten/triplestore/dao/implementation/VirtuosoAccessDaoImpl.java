@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 
@@ -368,6 +370,9 @@ public ArrayList<String> queryLearningObject(String learningObjectType, ArrayLis
 			while (results.hasNext()) {
 				QuerySolution result = results.nextSolution();
 			    RDFNode rdfNode = result.get("learning_object");
+//				Test purpose: see what searchTerm hit the result
+			    printWord(orSearchTerms, rdfNode.toString() + " = ");
+			    
 			    returnValue.add(rdfNode.toString());
 			    log.debug(graph + " { " + rdfNode + "  }");
 			}
@@ -1678,7 +1683,9 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
 		return tripleList;
 	}
 
-	public void testDictionary(String keyword) throws IOException {
+	public ArrayList<String> testDictionary(String keyword) throws IOException {
+		ArrayList<String> keyword_results = new ArrayList<String>();
+		
     	// construct the URL to the Wordnet dictionary directory
 //    	String wnhome = System.getenv (" WNHOME ");
 //    	String path = wnhome + File.separator + "dict";
@@ -1699,18 +1706,20 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
     		IWord eachWord = dict.getWord(wid);
     		System.out.println(eachWord.getLemma());
     	}
-    	
-    	ISynset synset = word.getSynset();
 
 //    	Get hypernyms from keyword.
     	ArrayList<String> hypernyms = getHypernyms(dict, keyword);
     	
     	for(String hypernym : hypernyms){
     		ArrayList<String> second_layer_results = getHypernyms(dict, hypernym);
-    		printWord(second_layer_results, "Second layer hypernym = ");
+    		second_layer_results = substitute_underscore(second_layer_results);
+    		keyword_results.addAll(second_layer_results);
+//    		printWord(second_layer_results, "Second layer hypernym = ");
 //    		System.out.println(" hypernym = " + hypernym);
     	}
-    	printWord(hypernyms, "First layer hypernym = ");
+    	hypernyms = substitute_underscore(hypernyms);
+    	keyword_results.addAll(hypernyms);
+//    	printWord(hypernyms, "First layer hypernym = ");
     	
 //    	Get synonyms from keyword.
     	ArrayList<String> synonyms = getSynonyms(dict, keyword);
@@ -1723,7 +1732,20 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
 //    	}
 //    	System.out.println(" Lemma = " + word.getLemma ());
 //    	System.out.println(" Gloss = " + word.getSynset().getGloss());
+    	
+//    	Remove duplicated keywords by converting to set data structure.
+    	Set<String> newSet = new HashSet<String>(keyword_results);
+    	keyword_results = new ArrayList<String>(newSet);
+    	return keyword_results;
     }
+	
+	public ArrayList<String> substitute_underscore(ArrayList<String> wordlist){
+		ArrayList<String> keyword_results = new ArrayList<String>();
+		for(String word : wordlist){
+			keyword_results.add(word.trim().replace('_', ' '));
+		}
+		return keyword_results;
+	}
 	
 	public void printWord(ArrayList<String> wordlist, String line_header){
 		for(String word : wordlist){
@@ -1792,9 +1814,15 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
 			while (st.hasMoreTokens()) {
 				String nextKeyword = st.nextToken().trim();
 				orSearchTerms.add(nextKeyword);
+				orSearchTerms.addAll(testDictionary(nextKeyword));
 //				Test JWI search
-				testDictionary(nextKeyword);
+//				printWord(testDictionary(nextKeyword), "Returned Keywords = ");
+//				testDictionary(nextKeyword);
 			}
+			
+//			For test purpose, choose first n element from orSearchTerms because search query is too long
+//			orSearchTerms = new ArrayList<String> (orSearchTerms.subList(0, 9));
+//			printWord(orSearchTerms, "Expected keywords = ");
 			
 			
 			ArrayList<String> andSearchTermsList = new ArrayList<String>();
@@ -1804,7 +1832,16 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
 			}
 			
 			ArrayList<String> uris = new ArrayList<String>();		
-			uris = queryLearningObject(type, orSearchTerms, andSearchTermsList);				
+//			uris = queryLearningObject(type, orSearchTerms, andSearchTermsList);
+			
+			for(int i = 0; i < orSearchTerms.size(); i += 10){
+				int last_index = (orSearchTerms.size() < i+10) ? orSearchTerms.size() : (i+10);
+				ArrayList<String> partialOrSearchTerms = new ArrayList<String> (orSearchTerms.subList(i, last_index));
+				ArrayList<String> partialUris = queryLearningObject(type, partialOrSearchTerms, andSearchTermsList);
+				uris.addAll(partialUris);
+			}
+//			ArrayList<String> uris = new ArrayList<String>();		
+//			uris = queryLearningObject(type, orSearchTerms, andSearchTermsList);				
 						
 			for(String uri: uris){
 				tenLearningObjectAnnotationsBean = new TenLearningObjectAnnotationsBean();
