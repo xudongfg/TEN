@@ -1701,8 +1701,22 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
     	}
     	
     	ISynset synset = word.getSynset();
-    	getHypernyms(dict, synset);
-    	getSynonyms(synset);
+
+//    	Get hypernyms from keyword.
+    	ArrayList<String> hypernyms = getHypernyms(dict, keyword);
+    	
+    	for(String hypernym : hypernyms){
+    		ArrayList<String> second_layer_results = getHypernyms(dict, hypernym);
+    		printWord(second_layer_results, "Second layer hypernym = ");
+//    		System.out.println(" hypernym = " + hypernym);
+    	}
+    	printWord(hypernyms, "First layer hypernym = ");
+    	
+//    	Get synonyms from keyword.
+    	ArrayList<String> synonyms = getSynonyms(dict, keyword);
+//    	for(String synonym : synonyms){
+//    		System.out.println(" Synonym = " + synonym);
+//    	}
     	
 //    	for(IWord w : synset.getWords()){
 //    		System.out.println(w.getLemma());
@@ -1711,28 +1725,48 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
 //    	System.out.println(" Gloss = " + word.getSynset().getGloss());
     }
 	
-	public void getSynonyms(ISynset synset){
-		for(IWord w : synset.getWords()){
-    		System.out.println(w.getLemma());
+	public void printWord(ArrayList<String> wordlist, String line_header){
+		for(String word : wordlist){
+    		System.out.println(line_header + word);
     	}
 	}
 	
-	public void getHypernyms(IDictionary dict, ISynset synset){
+	public ArrayList<String> getSynonyms(IDictionary dict, String keyword){
+		ArrayList<String> synonyms = new ArrayList<String>();
+		
+		// look up first sense of the keyword
+    	IIndexWord idxWord = dict.getIndexWord(keyword, POS.NOUN );
+    	IWordID wordID = idxWord.getWordIDs().get(0) ;
+    	IWord word = dict.getWord(wordID);
+    	ISynset synset = word.getSynset();
+		for(IWord w : synset.getWords()){
+			synonyms.add(w.getLemma());
+//    		System.out.println(w.getLemma());
+    	}
+		return synonyms;
+	}
+	
+	public ArrayList<String> getHypernyms(IDictionary dict, String keyword){
+		ArrayList<String> hypernymResult  = new ArrayList<String>();
+		
+		// look up first sense of the keyword
+    	IIndexWord idxWord = dict.getIndexWord(keyword, POS.NOUN );
+    	IWordID wordID = idxWord.getWordIDs().get(0) ;
+    	IWord word = dict.getWord(wordID);
+    	ISynset synset = word.getSynset();
+		
 //		get the hypernyms
 		List<ISynsetID> hypernyms = synset.getRelatedSynsets();
-//		List<ISynsetID> hypernyms = synset.getRelatedSynsets(Pointer.HYPERNYM);
 //		print out each hypernyms id and synonyms
 		List <IWord> words;
 		for(ISynsetID sid : hypernyms){
 			words = dict.getSynset(sid).getWords();
-			System.out.print(sid + " {");
 			for(Iterator<IWord> i = words.iterator(); i.hasNext();){
-				System.out.print(i.next().getLemma());
-				if(i.hasNext())
-					System.out.print(", ");
+				String hypernym = i.next().getLemma();
+				hypernymResult.add(hypernym);
 			}
-			System.out.println("}");
 		}
+		return hypernymResult;
 	}
 	
 	@Override
