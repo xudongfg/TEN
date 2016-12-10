@@ -370,8 +370,8 @@ public ArrayList<String> queryLearningObject(String learningObjectType, ArrayLis
 			while (results.hasNext()) {
 				QuerySolution result = results.nextSolution();
 			    RDFNode rdfNode = result.get("learning_object");
-//				Test purpose: see what searchTerm hit the result
-			    printWord(orSearchTerms, rdfNode.toString() + " = ");
+//			    Test what search terms lead to finding the result
+//			    printWord(orSearchTerms, rdfNode.toString() + ": ");
 			    
 			    returnValue.add(rdfNode.toString());
 			    log.debug(graph + " { " + rdfNode + "  }");
@@ -1696,7 +1696,7 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
     	IDictionary dict = new Dictionary (url);
     	dict.open();
 
-    	// look up first sense of the word "dog "
+    	// look up lexical related keywords
     	IIndexWord idxWord = dict.getIndexWord(keyword, POS.NOUN );
     	IWordID wordID = idxWord.getWordIDs().get(0) ;
     	IWord word = dict.getWord(wordID);
@@ -1704,7 +1704,7 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
     	List<IWordID> relatedWords = word.getRelatedWords();
     	for(IWordID wid : relatedWords){
     		IWord eachWord = dict.getWord(wid);
-    		System.out.println(eachWord.getLemma());
+//    		System.out.println(eachWord.getLemma());
     	}
 
 //    	Get hypernyms from keyword.
@@ -1730,12 +1730,12 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
 //    	for(IWord w : synset.getWords()){
 //    		System.out.println(w.getLemma());
 //    	}
-//    	System.out.println(" Lemma = " + word.getLemma ());
-//    	System.out.println(" Gloss = " + word.getSynset().getGloss());
     	
 //    	Remove duplicated keywords by converting to set data structure.
     	Set<String> newSet = new HashSet<String>(keyword_results);
     	keyword_results = new ArrayList<String>(newSet);
+    	
+
     	return keyword_results;
     }
 	
@@ -1820,10 +1820,27 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
 //				testDictionary(nextKeyword);
 			}
 			
-//			For test purpose, choose first n element from orSearchTerms because search query is too long
-//			orSearchTerms = new ArrayList<String> (orSearchTerms.subList(0, 9));
-//			printWord(orSearchTerms, "Expected keywords = ");
+//	    	Remove duplicated keywords by converting to set data structure.
+	    	Set<String> newSet = new HashSet<String>(orSearchTerms);
+	    	ArrayList<String> tempOrSearchTerms = new ArrayList<String>(newSet);
+	    	orSearchTerms = new ArrayList<String>();
 			
+//	    	Remove keywords which might be substring of search query
+	    	String forbiddenWords = new String(TripleStoreConstants.URI_IMAGE).toLowerCase();
+	    	System.out.println(forbiddenWords);
+	    	System.out.println("or search term number before remove action: " + tempOrSearchTerms.size());
+	    	for(String w : tempOrSearchTerms){
+	    		if (!forbiddenWords.contains(w.toLowerCase()) && (w.length() > 1)){
+	    			orSearchTerms.add(w);
+//	    			System.out.println("Forbidden Word: " + w);
+	    		}
+//	    		Debug purpose: show forbidden terms found
+	    		if (forbiddenWords.contains(w.toLowerCase()) && (w.length() > 1)){
+	    			System.out.println("Forbidden Word: " + w);
+	    		}
+	    	}
+	    	System.out.println("or search term number after remove action: " + orSearchTerms.size());
+//	    	printWord(orSearchTerms, "Keyword left: ");
 			
 			ArrayList<String> andSearchTermsList = new ArrayList<String>();
 			StringTokenizer andSt = new StringTokenizer(andSearchTerms);
