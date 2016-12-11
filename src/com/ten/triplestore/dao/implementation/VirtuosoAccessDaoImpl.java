@@ -1684,62 +1684,102 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
 	}
 
 	public ArrayList<String> testDictionary(String keyword) throws IOException {
+		keyword = keyword.trim().replace(' ', '_');
 		ArrayList<String> keyword_results = new ArrayList<String>();
 		
     	// construct the URL to the Wordnet dictionary directory
-//    	String wnhome = System.getenv (" WNHOME ");
-//    	String path = wnhome + File.separator + "dict";
     	String path = "C:\\TEN\\workspace\\TribalEducationNetwork\\WebContent\\WNdb-3.0\\dict";
     	System.out.println ("WNDB path is " + path );
     	URL url = new URL("file", null , path );
     	// construct the dictionary object and open it
     	IDictionary dict = new Dictionary (url);
     	dict.open();
-
-    	// look up lexical related keywords
-    	IIndexWord idxWord = dict.getIndexWord(keyword, POS.NOUN );
-    	IWordID wordID = idxWord.getWordIDs().get(0) ;
-    	IWord word = dict.getWord(wordID);
-    	System.out.println("Id = " + wordID );
-    	List<IWordID> relatedWords = word.getRelatedWords();
-    	for(IWordID wid : relatedWords){
-    		IWord eachWord = dict.getWord(wid);
-//    		System.out.println(eachWord.getLemma());
-    	}
-
-//    	Get hypernyms from keyword.
-    	ArrayList<String> hypernyms = getHypernyms(dict, keyword);
     	
-    	for(String hypernym : hypernyms){
-    		ArrayList<String> second_layer_results = getHypernyms(dict, hypernym);
-    		second_layer_results = substitute_underscore(second_layer_results);
-    		keyword_results.addAll(second_layer_results);
-//    		printWord(second_layer_results, "Second layer hypernym = ");
-//    		System.out.println(" hypernym = " + hypernym);
-    	}
-    	hypernyms = substitute_underscore(hypernyms);
-    	keyword_results.addAll(hypernyms);
-//    	printWord(hypernyms, "First layer hypernym = ");
-    	
-//    	Get synonyms from keyword.
-    	ArrayList<String> synonyms = getSynonyms(dict, keyword);
-//    	for(String synonym : synonyms){
-//    		System.out.println(" Synonym = " + synonym);
-//    	}
-    	
-//    	for(IWord w : synset.getWords()){
-//    		System.out.println(w.getLemma());
-//    	}
+//    	Get lexical related word from keyword
+    	ArrayList<String> lexicalRelatedWords = new ArrayList<String>();
+    	add_word_arraylist(getLexicalRelatedWords(dict, keyword, POS.ADJECTIVE), lexicalRelatedWords);
+    	add_word_arraylist(getLexicalRelatedWords(dict, keyword, POS.ADVERB), lexicalRelatedWords);
+    	add_word_arraylist(getLexicalRelatedWords(dict, keyword, POS.NOUN), lexicalRelatedWords);
+    	add_word_arraylist(getLexicalRelatedWords(dict, keyword, POS.VERB), lexicalRelatedWords);
+    	lexicalRelatedWords.add(keyword);
     	
 //    	Remove duplicated keywords by converting to set data structure.
-    	Set<String> newSet = new HashSet<String>(keyword_results);
+    	Set<String> newSet = new HashSet<String>(lexicalRelatedWords);
+    	lexicalRelatedWords = new ArrayList<String>(newSet);
+    	keyword_results.addAll(lexicalRelatedWords);
+    	
+//    	Get synonyms from keyword.
+    	ArrayList<String> synonyms = new ArrayList<String>();
+    	for(String lexicalRelatedWord : lexicalRelatedWords){
+    		add_word_arraylist(getSynonyms(dict, lexicalRelatedWord, POS.ADJECTIVE), synonyms);
+    		add_word_arraylist(getSynonyms(dict, lexicalRelatedWord, POS.ADVERB), synonyms);
+    		add_word_arraylist(getSynonyms(dict, lexicalRelatedWord, POS.NOUN), synonyms);
+    		add_word_arraylist(getSynonyms(dict, lexicalRelatedWord, POS.VERB), synonyms);
+    	}
+    	keyword_results.addAll(synonyms);
+//    	
+////    	Get synonyms of synonyms and add them to the result set.
+    	ArrayList<String> second_layer_synonym_results = new ArrayList<String>();
+    	for(String synonym : synonyms){
+    		add_word_arraylist(getSynonyms(dict, synonym, POS.ADJECTIVE), second_layer_synonym_results);
+    		add_word_arraylist(getSynonyms(dict, synonym, POS.ADVERB), second_layer_synonym_results);
+    		add_word_arraylist(getSynonyms(dict, synonym, POS.NOUN), second_layer_synonym_results);
+    		add_word_arraylist(getSynonyms(dict, synonym, POS.VERB), second_layer_synonym_results);
+    	}
+    	keyword_results.addAll(second_layer_synonym_results);
+
+//    	Remove duplicated keywords by converting to set data structure.
+    	newSet = new HashSet<String>(keyword_results);
     	keyword_results = new ArrayList<String>(newSet);
     	
+//		Get hypernyms from keyword.
+    	ArrayList<String> hypernyms = new ArrayList<String>();
+    	for(String hypernym : keyword_results){
+    		add_word_arraylist(getHypernyms(dict, hypernym, POS.ADJECTIVE), hypernyms);
+    		add_word_arraylist(getHypernyms(dict, hypernym, POS.ADVERB), hypernyms);
+    		add_word_arraylist(getHypernyms(dict, hypernym, POS.NOUN), hypernyms);
+    		add_word_arraylist(getHypernyms(dict, hypernym, POS.VERB), hypernyms);
+    	}
+    	keyword_results.addAll(hypernyms);
+//    	
+//    	ArrayList<String> second_layer_results = new ArrayList<String>();
+//    	for(String hypernym : hypernyms){
+//    		add_word_arraylist(getHypernyms(dict, hypernym, POS.ADJECTIVE), second_layer_results);
+//    		add_word_arraylist(getHypernyms(dict, hypernym, POS.ADVERB), second_layer_results);
+//    		add_word_arraylist(getHypernyms(dict, hypernym, POS.NOUN), second_layer_results);
+//    		add_word_arraylist(getHypernyms(dict, hypernym, POS.VERB), second_layer_results);
+//    	}
+//    	keyword_results.addAll(second_layer_results);
+
+//    	Get lexical related word from keyword
+    	lexicalRelatedWords = new ArrayList<String>();
+    	for(String lexicalRelatedWord : keyword_results){
+    		add_word_arraylist(getLexicalRelatedWords(dict, lexicalRelatedWord, POS.ADJECTIVE), lexicalRelatedWords);
+        	add_word_arraylist(getLexicalRelatedWords(dict, lexicalRelatedWord, POS.ADVERB), lexicalRelatedWords);
+        	add_word_arraylist(getLexicalRelatedWords(dict, lexicalRelatedWord, POS.NOUN), lexicalRelatedWords);
+        	add_word_arraylist(getLexicalRelatedWords(dict, lexicalRelatedWord, POS.VERB), lexicalRelatedWords);
+    	}
+    	add_word_arraylist(lexicalRelatedWords, keyword_results);
+    	
+//    	Remove duplicated keywords by converting to set data structure.
+    	newSet = new HashSet<String>(keyword_results);
+    	keyword_results = new ArrayList<String>(newSet);
+    	keyword_results = substitute_underscore(keyword_results);
+    	
+//    	Debug: Print out result
+    	printWord(keyword_results, "Keyword result: ");
+    	System.out.println("Related words are found: " + keyword_results.size());
 
     	return keyword_results;
     }
 	
-	public ArrayList<String> substitute_underscore(ArrayList<String> wordlist){
+	private void add_word_arraylist(ArrayList<String> source_list, ArrayList<String> target_list){
+		if(source_list != null){
+			target_list.addAll(source_list);
+		}
+	}
+	
+	private ArrayList<String> substitute_underscore(ArrayList<String> wordlist){
 		ArrayList<String> keyword_results = new ArrayList<String>();
 		for(String word : wordlist){
 			keyword_results.add(word.trim().replace('_', ' '));
@@ -1753,26 +1793,31 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
     	}
 	}
 	
-	public ArrayList<String> getSynonyms(IDictionary dict, String keyword){
+	public ArrayList<String> getSynonyms(IDictionary dict, String keyword, POS partOfSpeech){
 		ArrayList<String> synonyms = new ArrayList<String>();
-		
 		// look up first sense of the keyword
-    	IIndexWord idxWord = dict.getIndexWord(keyword, POS.NOUN );
+    	IIndexWord idxWord = dict.getIndexWord(keyword, partOfSpeech);
+    	if(idxWord == null){
+    		System.out.println("Cannot find  keyword for part of speech " + partOfSpeech.name());
+    		return null;
+    	}
     	IWordID wordID = idxWord.getWordIDs().get(0) ;
     	IWord word = dict.getWord(wordID);
     	ISynset synset = word.getSynset();
 		for(IWord w : synset.getWords()){
 			synonyms.add(w.getLemma());
-//    		System.out.println(w.getLemma());
     	}
 		return synonyms;
 	}
 	
-	public ArrayList<String> getHypernyms(IDictionary dict, String keyword){
+	public ArrayList<String> getHypernyms(IDictionary dict, String keyword, POS partOfSpeech){
 		ArrayList<String> hypernymResult  = new ArrayList<String>();
-		
 		// look up first sense of the keyword
-    	IIndexWord idxWord = dict.getIndexWord(keyword, POS.NOUN );
+    	IIndexWord idxWord = dict.getIndexWord(keyword, partOfSpeech);
+    	if(idxWord == null){
+    		System.out.println("Cannot find  keyword for part of speech " + partOfSpeech.name());
+    		return null;
+    	}
     	IWordID wordID = idxWord.getWordIDs().get(0) ;
     	IWord word = dict.getWord(wordID);
     	ISynset synset = word.getSynset();
@@ -1789,6 +1834,30 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
 			}
 		}
 		return hypernymResult;
+	}
+
+	public ArrayList<String> getLexicalRelatedWords(IDictionary dict, String keyword, POS partOfSpeech){
+		ArrayList<String> lexicalRelatedResult  = new ArrayList<String>();
+    	// look up lexical related keywords
+    	IIndexWord idxWord = dict.getIndexWord(keyword, partOfSpeech);
+    	if(idxWord == null){
+    		System.out.println("Cannot find  keyword for part of speech " + partOfSpeech.name());
+    		return null;
+    	}
+    	IWordID wordID = idxWord.getWordIDs().get(0) ;
+    	IWord word = dict.getWord(wordID);
+    	List<IWordID> relatedWords = word.getRelatedWords();
+    	if(relatedWords.size() == 0){
+    		System.out.println("Cannot find lexical related word for part of speech " + partOfSpeech.name());
+    		return null;
+    	}
+    	for(IWordID wid : relatedWords){
+    		IWord eachWord = dict.getWord(wid);
+//    		System.out.println(eachWord.getLemma());
+    		lexicalRelatedResult.add(eachWord.getLemma());
+    	}
+    	
+		return lexicalRelatedResult;
 	}
 	
 	@Override
@@ -1810,7 +1879,7 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
 			
 			//separate the search terms
 			ArrayList<String> orSearchTerms = new ArrayList<String>();
-			StringTokenizer st = new StringTokenizer(keywords);
+			StringTokenizer st = new StringTokenizer(keywords, ",");
 			while (st.hasMoreTokens()) {
 				String nextKeyword = st.nextToken().trim();
 				orSearchTerms.add(nextKeyword);
