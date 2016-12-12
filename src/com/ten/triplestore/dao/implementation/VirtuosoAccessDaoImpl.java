@@ -1697,73 +1697,37 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
     	
 //    	Get lexical related word from keyword
     	ArrayList<String> lexicalRelatedWords = new ArrayList<String>();
-    	add_word_arraylist(getLexicalRelatedWords(dict, keyword, POS.ADJECTIVE), lexicalRelatedWords);
-    	add_word_arraylist(getLexicalRelatedWords(dict, keyword, POS.ADVERB), lexicalRelatedWords);
-    	add_word_arraylist(getLexicalRelatedWords(dict, keyword, POS.NOUN), lexicalRelatedWords);
-    	add_word_arraylist(getLexicalRelatedWords(dict, keyword, POS.VERB), lexicalRelatedWords);
+    	add_word_arraylist(getLexicalRelatedToArrayList(dict, keyword), lexicalRelatedWords);
     	lexicalRelatedWords.add(keyword);
     	
 //    	Remove duplicated keywords by converting to set data structure.
-    	Set<String> newSet = new HashSet<String>(lexicalRelatedWords);
-    	lexicalRelatedWords = new ArrayList<String>(newSet);
+    	lexicalRelatedWords = remove_duplicated_keywords(lexicalRelatedWords);
     	keyword_results.addAll(lexicalRelatedWords);
     	
 //    	Get synonyms from keyword.
     	ArrayList<String> synonyms = new ArrayList<String>();
-    	for(String lexicalRelatedWord : lexicalRelatedWords){
-    		add_word_arraylist(getSynonyms(dict, lexicalRelatedWord, POS.ADJECTIVE), synonyms);
-    		add_word_arraylist(getSynonyms(dict, lexicalRelatedWord, POS.ADVERB), synonyms);
-    		add_word_arraylist(getSynonyms(dict, lexicalRelatedWord, POS.NOUN), synonyms);
-    		add_word_arraylist(getSynonyms(dict, lexicalRelatedWord, POS.VERB), synonyms);
-    	}
-    	keyword_results.addAll(synonyms);
-//    	
-////    	Get synonyms of synonyms and add them to the result set.
+    	add_word_arraylist(getSynonymsToArrayList(dict, lexicalRelatedWords), synonyms);
+    	add_word_arraylist(synonyms, keyword_results);
+    	
+//    	Get synonyms of synonyms and add them to the result set.
     	ArrayList<String> second_layer_synonym_results = new ArrayList<String>();
-    	for(String synonym : synonyms){
-    		add_word_arraylist(getSynonyms(dict, synonym, POS.ADJECTIVE), second_layer_synonym_results);
-    		add_word_arraylist(getSynonyms(dict, synonym, POS.ADVERB), second_layer_synonym_results);
-    		add_word_arraylist(getSynonyms(dict, synonym, POS.NOUN), second_layer_synonym_results);
-    		add_word_arraylist(getSynonyms(dict, synonym, POS.VERB), second_layer_synonym_results);
-    	}
-    	keyword_results.addAll(second_layer_synonym_results);
+    	add_word_arraylist(getSynonymsToArrayList(dict, synonyms), second_layer_synonym_results);
+    	add_word_arraylist(second_layer_synonym_results, keyword_results);
 
 //    	Remove duplicated keywords by converting to set data structure.
-    	newSet = new HashSet<String>(keyword_results);
-    	keyword_results = new ArrayList<String>(newSet);
+    	keyword_results = remove_duplicated_keywords(keyword_results);
     	
 //		Get hypernyms from keyword.
     	ArrayList<String> hypernyms = new ArrayList<String>();
-    	for(String hypernym : keyword_results){
-    		add_word_arraylist(getHypernyms(dict, hypernym, POS.ADJECTIVE), hypernyms);
-    		add_word_arraylist(getHypernyms(dict, hypernym, POS.ADVERB), hypernyms);
-    		add_word_arraylist(getHypernyms(dict, hypernym, POS.NOUN), hypernyms);
-    		add_word_arraylist(getHypernyms(dict, hypernym, POS.VERB), hypernyms);
-    	}
-    	keyword_results.addAll(hypernyms);
-//    	
-//    	ArrayList<String> second_layer_results = new ArrayList<String>();
-//    	for(String hypernym : hypernyms){
-//    		add_word_arraylist(getHypernyms(dict, hypernym, POS.ADJECTIVE), second_layer_results);
-//    		add_word_arraylist(getHypernyms(dict, hypernym, POS.ADVERB), second_layer_results);
-//    		add_word_arraylist(getHypernyms(dict, hypernym, POS.NOUN), second_layer_results);
-//    		add_word_arraylist(getHypernyms(dict, hypernym, POS.VERB), second_layer_results);
-//    	}
-//    	keyword_results.addAll(second_layer_results);
+    	add_word_arraylist(getHypernymsToArrayList(dict, keyword_results), hypernyms);
+    	add_word_arraylist(hypernyms, keyword_results);
 
-//    	Get lexical related word from keyword
-    	lexicalRelatedWords = new ArrayList<String>();
-    	for(String lexicalRelatedWord : keyword_results){
-    		add_word_arraylist(getLexicalRelatedWords(dict, lexicalRelatedWord, POS.ADJECTIVE), lexicalRelatedWords);
-        	add_word_arraylist(getLexicalRelatedWords(dict, lexicalRelatedWord, POS.ADVERB), lexicalRelatedWords);
-        	add_word_arraylist(getLexicalRelatedWords(dict, lexicalRelatedWord, POS.NOUN), lexicalRelatedWords);
-        	add_word_arraylist(getLexicalRelatedWords(dict, lexicalRelatedWord, POS.VERB), lexicalRelatedWords);
-    	}
-    	add_word_arraylist(lexicalRelatedWords, keyword_results);
+//    	Get lexical related word from keyword.
+    	add_word_arraylist(getLexicalRelatedToArrayList(dict, keyword_results), keyword_results);
     	
 //    	Remove duplicated keywords by converting to set data structure.
-    	newSet = new HashSet<String>(keyword_results);
-    	keyword_results = new ArrayList<String>(newSet);
+    	keyword_results = remove_duplicated_keywords(keyword_results);
+    	
     	keyword_results = substitute_underscore(keyword_results);
     	
 //    	Debug: Print out result
@@ -1779,6 +1743,12 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
 		}
 	}
 	
+	private ArrayList<String> remove_duplicated_keywords(ArrayList<String> wordlist){
+		Set<String> newSet = new HashSet<String>(wordlist);
+		ArrayList<String> result_word_list = new ArrayList<String>(newSet);
+    	return result_word_list;
+	}
+	
 	private ArrayList<String> substitute_underscore(ArrayList<String> wordlist){
 		ArrayList<String> keyword_results = new ArrayList<String>();
 		for(String word : wordlist){
@@ -1791,6 +1761,38 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
 		for(String word : wordlist){
     		System.out.println(line_header + word);
     	}
+	}
+	
+	private ArrayList<String> getLexicalRelatedToArrayList(IDictionary dict, ArrayList<String> keyword_results){
+		ArrayList<String> lexicalRelatedWords = new ArrayList<String>();
+    	for(String lexicalRelatedWord : keyword_results){
+    		add_word_arraylist(getLexicalRelatedWords(dict, lexicalRelatedWord, POS.ADJECTIVE), lexicalRelatedWords);
+        	add_word_arraylist(getLexicalRelatedWords(dict, lexicalRelatedWord, POS.ADVERB), lexicalRelatedWords);
+        	add_word_arraylist(getLexicalRelatedWords(dict, lexicalRelatedWord, POS.NOUN), lexicalRelatedWords);
+        	add_word_arraylist(getLexicalRelatedWords(dict, lexicalRelatedWord, POS.VERB), lexicalRelatedWords);
+    	}
+		return lexicalRelatedWords;
+	}
+	
+	private ArrayList<String> getLexicalRelatedToArrayList(IDictionary dict, String keyword){
+		ArrayList<String> lexicalRelatedWords = new ArrayList<String>();
+    	add_word_arraylist(getLexicalRelatedWords(dict, keyword, POS.ADJECTIVE), lexicalRelatedWords);
+    	add_word_arraylist(getLexicalRelatedWords(dict, keyword, POS.ADVERB), lexicalRelatedWords);
+    	add_word_arraylist(getLexicalRelatedWords(dict, keyword, POS.NOUN), lexicalRelatedWords);
+    	add_word_arraylist(getLexicalRelatedWords(dict, keyword, POS.VERB), lexicalRelatedWords);
+    	lexicalRelatedWords.add(keyword);
+    	return lexicalRelatedWords;
+	}
+	
+	private ArrayList<String> getSynonymsToArrayList(IDictionary dict, ArrayList<String> keyword_results){
+		ArrayList<String> synonyms = new ArrayList<String>();
+    	for(String lexicalRelatedWord : keyword_results){
+    		add_word_arraylist(getSynonyms(dict, lexicalRelatedWord, POS.ADJECTIVE), synonyms);
+    		add_word_arraylist(getSynonyms(dict, lexicalRelatedWord, POS.ADVERB), synonyms);
+    		add_word_arraylist(getSynonyms(dict, lexicalRelatedWord, POS.NOUN), synonyms);
+    		add_word_arraylist(getSynonyms(dict, lexicalRelatedWord, POS.VERB), synonyms);
+    	}
+		return synonyms;
 	}
 	
 	public ArrayList<String> getSynonyms(IDictionary dict, String keyword, POS partOfSpeech){
@@ -1808,6 +1810,17 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
 			synonyms.add(w.getLemma());
     	}
 		return synonyms;
+	}
+	
+	private ArrayList<String> getHypernymsToArrayList(IDictionary dict, ArrayList<String> keyword_results){
+		ArrayList<String> hypernyms = new ArrayList<String>();
+    	for(String hypernym : keyword_results){
+    		add_word_arraylist(getHypernyms(dict, hypernym, POS.ADJECTIVE), hypernyms);
+    		add_word_arraylist(getHypernyms(dict, hypernym, POS.ADVERB), hypernyms);
+    		add_word_arraylist(getHypernyms(dict, hypernym, POS.NOUN), hypernyms);
+    		add_word_arraylist(getHypernyms(dict, hypernym, POS.VERB), hypernyms);
+    	}
+		return hypernyms;
 	}
 	
 	public ArrayList<String> getHypernyms(IDictionary dict, String keyword, POS partOfSpeech){
