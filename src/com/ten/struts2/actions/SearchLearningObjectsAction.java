@@ -178,12 +178,6 @@ public class SearchLearningObjectsAction extends ActionSupport implements Sessio
         // search learning objects in triple store
         TriplestoreAccessDaoInterface tdbAccessDaoInterface = new VirtuosoAccessDaoImpl();
         
-        //Play with keyword to see whether finding semantic keyword works.
-//        if (keywords.equals("ocean")) {
-//        	keywords = "sea";
-//        }
-//        testDictionary ();
-        
         HashMap<String,TenLearningObjectAnnotationsBean> mapLearningObjects = tdbAccessDaoInterface.searchLearningObjects(typeOfLearningObject, keywords, "");
         
         // get learning object details

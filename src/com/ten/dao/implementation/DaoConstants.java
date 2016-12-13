@@ -18,7 +18,7 @@ public interface DaoConstants {
 	
 	public static final String INSERT_AUDIO_PROCEDURE_CALL = "call INSERT_AUDIO(?,?,?,?,?)";
 	
-	public static final String INSERT_TEXT_PROCEDURE_CALL = "call INSERT_TEXT(?,?,?,?,?)";
+	public static final String INSERT_TEXT_PROCEDURE_CALL = "call INSERT_TEXT(?,?,?,?,?,?)";
 	
 	public static final String INSERT_USER_PROCEDURE_CALL = "call INSERT_USER(?,?,?,?,?,?,?)";
 	

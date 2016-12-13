@@ -15,6 +15,11 @@ import com.ten.beans.*;
 import model.Permission;
 import model.Role;
 import org.apache.log4j.Logger;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.TikaCoreProperties;
+import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.sax.BodyContentHandler;
 
 import com.ten.dao.interfaces.DbAccessDaoInterface;
 import com.ten.triplestore.dao.implementation.TripleStoreConstants;
@@ -463,6 +468,46 @@ public class DbAccessDaoImpl implements DbAccessDaoInterface{
 		return audio_id;
 	}
 
+	public Map<String, Object> processRecord(File file) {
+//	    DefaultHttpClient httpclient = new DefaultHttpClient();
+	    Map<String, Object> map = new HashMap<String, Object>();
+	    try {
+//	        HttpGet httpGet = new HttpGet(url);
+//	        HttpResponse response = httpclient.execute(httpGet);
+//	        HttpEntity entity = response.getEntity();
+	    	// declare FileInputStream object to store binary stream of given text.
+			FileInputStream fis = new FileInputStream(file);
+//	        InputStream input = null;
+	                if (fis != null) {
+	                    try{
+	                    	
+//	                        input = entity.getContent();
+	                        BodyContentHandler handler = new BodyContentHandler();
+	                        Metadata metadata = new Metadata();
+	                        AutoDetectParser parser = new AutoDetectParser();
+	                        ParseContext parseContext = new ParseContext();
+	                        parser.parse(fis, handler, metadata, parseContext);
+	                        map.put("text", handler.toString().replaceAll("\n|\r|\t", " "));
+	                        map.put("title", metadata.get(TikaCoreProperties.TITLE));
+	                        map.put("pageCount", metadata.get("xmpTPg:NPages"));
+	                } catch (Exception e) {                     
+	                    e.printStackTrace();
+	                }finally{
+	                    if(fis != null){
+	                        try {
+	                        	fis.close();
+	                        } catch (IOException e) {
+	                            e.printStackTrace();
+	                        }
+	                    }
+	                }
+	                }
+	            }catch (Exception exception) {
+	                exception.printStackTrace();
+	            }
+	    return map;
+	}
+	
 	@Override
 	/**
 	 * This method is invoked by uploadTextAction to store the text to database.
@@ -485,6 +530,11 @@ public class DbAccessDaoImpl implements DbAccessDaoInterface{
 		FileInputStream fis = null;		
 		int text_id = 0;
 		
+//		Test Tika
+		Map<String, Object> extractedMap = processRecord(file);
+		String contextText = extractedMap.get("text").toString();
+	    System.out.println("Text in " + fileType + ": " + contextText);
+		
 		try {
 			connection = getConnection();
 			
@@ -495,12 +545,13 @@ public class DbAccessDaoImpl implements DbAccessDaoInterface{
 			callableStatement.setString(2, fileType);
 			callableStatement.setString(3, fileName);
 			callableStatement.setInt(4, annotated?1:0);
-			callableStatement.registerOutParameter(5, java.sql.Types.INTEGER);
+			callableStatement.setString(5, contextText);
+			callableStatement.registerOutParameter(6, java.sql.Types.INTEGER);
 			 
 			// execute store procedure
 			callableStatement.executeUpdate();
 			
-			text_id = callableStatement.getInt(5);	
+			text_id = callableStatement.getInt(6);	
 			if(text_id == 0){
 				throw new Exception("Text cannot be uploaded");
 			}
