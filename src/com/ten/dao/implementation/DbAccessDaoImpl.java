@@ -1409,8 +1409,8 @@ public class DbAccessDaoImpl implements DbAccessDaoInterface{
     }
     
     public ArrayList<Integer> getLearningObjectIdByFullTextSearch(String keyword) throws Exception {
-//        String LOG_METHOD_NAME = "LearningObjectDetailsBean getLearningObject(int id)";;
-//        log.debug(this.getClass() + DaoConstants.LOG_BEGIN + LOG_METHOD_NAME);
+        String LOG_METHOD_NAME = "ArrayList<Integer> getLearningObjectIdByFullTextSearch(String keyword)";;
+        log.debug(this.getClass() + DaoConstants.LOG_BEGIN + LOG_METHOD_NAME);
     	
     	ArrayList<Integer> LearningObjectIds = new ArrayList<Integer>();
 
@@ -1424,16 +1424,17 @@ public class DbAccessDaoImpl implements DbAccessDaoInterface{
         ResultSet rset = null;
 
         try {
+        	String search_keyword = keyword + "*";
             connection = getConnection();
             String sql = DaoConstants.GET_LEARNING_OBJECT_BY_FULL_TEXT_SEARCH;
             preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1, keyword);
+            preparedStatement.setString(1, search_keyword);
             rset = preparedStatement.executeQuery();
 
             while (rset.next ())
             {
             	LearningObjectIds.add(rset.getInt(1));
-            	System.out.println("Learning object id: " + rset.getInt(1));
+//            	System.out.println("Learning object id: " + rset.getInt(1));
             }
         } catch (Exception ex) {
             // catch if found any exception during rum time.
@@ -1445,7 +1446,7 @@ public class DbAccessDaoImpl implements DbAccessDaoInterface{
             connection.close();
             preparedStatement.close();
             System.out.println("Connection closed.");
-//            log.debug(this.getClass() + DaoConstants.LOG_END + LOG_METHOD_NAME);
+            log.debug(this.getClass() + DaoConstants.LOG_END + LOG_METHOD_NAME);
         }
         return LearningObjectIds;
     }

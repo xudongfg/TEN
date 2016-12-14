@@ -1683,7 +1683,7 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
 		return tripleList;
 	}
 
-	public ArrayList<String> testDictionary(String keyword) throws IOException {
+	public ArrayList<String> getSemanticRelatedKeywords(String keyword) throws IOException {
 		keyword = keyword.trim().replace(' ', '_');
 		ArrayList<String> keyword_results = new ArrayList<String>();
 		
@@ -1732,7 +1732,7 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
     	
 //    	Debug: Print out result
     	printWord(keyword_results, "Keyword result: ");
-//    	System.out.println("Related words are found: " + keyword_results.size());
+    	System.out.println("Related words are found: " + keyword_results.size());
 
     	return keyword_results;
     }
@@ -1895,6 +1895,7 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
 			while (st.hasMoreTokens()) {
 				String nextKeyword = st.nextToken().trim();
 				orSearchTerms.add(nextKeyword);
+				orSearchTerms.addAll(getSemanticRelatedKeywords(nextKeyword));
 			}
 			
 //	    	Remove duplicated keywords by converting to set data structure.

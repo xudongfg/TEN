@@ -196,12 +196,12 @@ public class SearchLearningObjectsAction extends ActionSupport implements Sessio
         System.out.println("Type of Learning Object is: " + typeOfLearningObject);
         
 //      Full text search text learning objects
-        if (typeOfLearningObject.equals("Text")){
+//        if (typeOfLearningObject.equals("Text")){
         	HashSet<LearningObjectDetailsBean> fullTextLearningObjectsSearchResults = dbAccessDaoInterface.getLearningObjectsByFullTextSearch(keywords);
             if (fullTextLearningObjectsSearchResults != null){
             	combinedLearningObjectsSearchResults.addAll(fullTextLearningObjectsSearchResults);
             }
-        }
+//        }
 
         // make search results map with key as learning object id, this is used by the view
         for (LearningObjectDetailsBean learningObject : combinedLearningObjectsSearchResults) {
