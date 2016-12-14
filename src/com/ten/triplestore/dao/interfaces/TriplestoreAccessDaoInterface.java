@@ -1,4 +1,5 @@
 package com.ten.triplestore.dao.interfaces;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import com.ten.beans.CourseAnnotationsBean;
@@ -64,4 +65,7 @@ public interface TriplestoreAccessDaoInterface {
 	public  HashMap<String, ArrayList<String>> queryDefaultLearningObjects(String keywords, String andSearchTerms) throws Exception;
 	
 	public ArrayList<LearningObjectBean> removeItemsWithoutStory(ArrayList<LearningObjectBean> learningObjects, String learningObjectType) throws Exception;
+	
+//	Get semantic related keywords
+	public ArrayList<String> getSemanticRelatedKeywords(String keyword) throws IOException;
 }

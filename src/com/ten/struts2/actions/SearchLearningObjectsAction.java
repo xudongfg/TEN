@@ -197,7 +197,8 @@ public class SearchLearningObjectsAction extends ActionSupport implements Sessio
         
 //      Full text search text learning objects
 //        if (typeOfLearningObject.equals("Text")){
-        	HashSet<LearningObjectDetailsBean> fullTextLearningObjectsSearchResults = dbAccessDaoInterface.getLearningObjectsByFullTextSearch(keywords);
+        	ArrayList<String> semanticRelatedKeywords = tdbAccessDaoInterface.getSemanticRelatedKeywords(keywords);
+        	HashSet<LearningObjectDetailsBean> fullTextLearningObjectsSearchResults = dbAccessDaoInterface.getLearningObjectsByFullTextSearch(semanticRelatedKeywords);
             if (fullTextLearningObjectsSearchResults != null){
             	combinedLearningObjectsSearchResults.addAll(fullTextLearningObjectsSearchResults);
             }

@@ -69,7 +69,7 @@ public interface DbAccessDaoInterface {
     /**
      * Get HashSet of learning objects search keyword
      * */
-    public HashSet<LearningObjectDetailsBean> getLearningObjectsByFullTextSearch(String keyword) throws Exception;
+    HashSet<LearningObjectDetailsBean> getLearningObjectsByFullTextSearch(ArrayList<String> keywords) throws Exception;
 
     /**
      * Get course by its id

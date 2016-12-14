@@ -1399,11 +1399,13 @@ public class DbAccessDaoImpl implements DbAccessDaoInterface{
         return learningObject;
     }
     
-    public HashSet<LearningObjectDetailsBean> getLearningObjectsByFullTextSearch(String keyword) throws Exception {
+    public HashSet<LearningObjectDetailsBean> getLearningObjectsByFullTextSearch(ArrayList<String> keywords) throws Exception {
     	HashSet<LearningObjectDetailsBean> learningObjects = new HashSet<LearningObjectDetailsBean>();
-    	ArrayList<Integer> learningObjectIds = getLearningObjectIdByFullTextSearch(keyword);
-    	for(int id : learningObjectIds){
-    		learningObjects.add(getLearningObject(id));
+    	for (String keyword : keywords){
+    		ArrayList<Integer> learningObjectIds = getLearningObjectIdByFullTextSearch(keyword);
+        	for(int id : learningObjectIds){
+        		learningObjects.add(getLearningObject(id));
+        	}
     	}
     	return learningObjects;
     }
