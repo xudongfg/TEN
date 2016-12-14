@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
@@ -195,14 +196,20 @@ public class SearchLearningObjectsAction extends ActionSupport implements Sessio
         
         System.out.println("Type of Learning Object is: " + typeOfLearningObject);
         
-//      Full text search text learning objects
-//        if (typeOfLearningObject.equals("Text")){
-        	ArrayList<String> semanticRelatedKeywords = tdbAccessDaoInterface.getSemanticRelatedKeywords(keywords);
-        	HashSet<LearningObjectDetailsBean> fullTextLearningObjectsSearchResults = dbAccessDaoInterface.getLearningObjectsByFullTextSearch(semanticRelatedKeywords);
-            if (fullTextLearningObjectsSearchResults != null){
-            	combinedLearningObjectsSearchResults.addAll(fullTextLearningObjectsSearchResults);
-            }
-//        }
+		//      Full text search text learning objects
+		if (typeOfLearningObject.equals("Text")){
+			ArrayList<String> semanticRelatedKeywords = new ArrayList<String>();
+			StringTokenizer st = new StringTokenizer(keywords, ",");
+			while (st.hasMoreTokens()) {
+				String nextKeyword = st.nextToken().trim();
+				semanticRelatedKeywords.addAll(tdbAccessDaoInterface.getSemanticRelatedKeywords(nextKeyword)) ;
+			}
+	
+			HashSet<LearningObjectDetailsBean> fullTextLearningObjectsSearchResults = dbAccessDaoInterface.getLearningObjectsByFullTextSearch(semanticRelatedKeywords);
+			if (fullTextLearningObjectsSearchResults != null){
+				combinedLearningObjectsSearchResults.addAll(fullTextLearningObjectsSearchResults);
+			}
+		}
 
         // make search results map with key as learning object id, this is used by the view
         for (LearningObjectDetailsBean learningObject : combinedLearningObjectsSearchResults) {

@@ -1447,7 +1447,7 @@ public class DbAccessDaoImpl implements DbAccessDaoInterface{
             rset.close();
             connection.close();
             preparedStatement.close();
-            System.out.println("Connection closed.");
+//            System.out.println("Connection closed.");
             log.debug(this.getClass() + DaoConstants.LOG_END + LOG_METHOD_NAME);
         }
         return LearningObjectIds;
