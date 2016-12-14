@@ -65,6 +65,11 @@ public interface DbAccessDaoInterface {
      * Get map of learning objects mapped by given Uris
      * */
     public HashMap<String, LearningObjectDetailsBean> getMapOfLearningObjects(Collection<String> uris) throws Exception;
+    
+    /**
+     * Get HashSet of learning objects search keyword
+     * */
+    public HashSet<LearningObjectDetailsBean> getLearningObjectsByFullTextSearch(String keyword) throws Exception;
 
     /**
      * Get course by its id
@@ -110,6 +115,11 @@ public interface DbAccessDaoInterface {
      * Get the learning object with the given id
      * */
     public LearningObjectDetailsBean getLearningObject(int id) throws Exception;
+    
+    /**
+     * Get the learning object id with the given keyword through full-text search
+     * */
+    ArrayList<Integer> getLearningObjectIdByFullTextSearch(String keyword) throws Exception;
 
     /**
      * Get all the cultural learning objects

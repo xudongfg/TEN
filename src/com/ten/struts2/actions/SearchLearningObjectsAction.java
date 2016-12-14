@@ -6,6 +6,7 @@ import java.lang.Exception;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeSet;
@@ -175,6 +176,8 @@ public class SearchLearningObjectsAction extends ActionSupport implements Sessio
         if (keywords == null || keywords.isEmpty() || typeOfLearningObject == null || typeOfLearningObject.isEmpty()) {
             return new HashMap<Integer, LearningObjectDetailsBean>();
         }
+
+        
         // search learning objects in triple store
         TriplestoreAccessDaoInterface tdbAccessDaoInterface = new VirtuosoAccessDaoImpl();
         
@@ -184,9 +187,24 @@ public class SearchLearningObjectsAction extends ActionSupport implements Sessio
         Map<String, LearningObjectDetailsBean> mapLearningObjectDetails = dbAccessDaoInterface.getMapOfLearningObjects(mapLearningObjects.keySet()); 
         
         Map<Integer, LearningObjectDetailsBean> learningObjectsSearchResults = new HashMap<Integer, LearningObjectDetailsBean>(); // clear past results
+        
+        HashSet<LearningObjectDetailsBean> combinedLearningObjectsSearchResults = new HashSet<LearningObjectDetailsBean>();
+        if (mapLearningObjectDetails.values() != null){
+        	combinedLearningObjectsSearchResults.addAll(mapLearningObjectDetails.values());
+        }
+        
+        System.out.println("Type of Learning Object is: " + typeOfLearningObject);
+        
+//      Full text search text learning objects
+        if (typeOfLearningObject.equals("Text")){
+        	HashSet<LearningObjectDetailsBean> fullTextLearningObjectsSearchResults = dbAccessDaoInterface.getLearningObjectsByFullTextSearch(keywords);
+            if (fullTextLearningObjectsSearchResults != null){
+            	combinedLearningObjectsSearchResults.addAll(fullTextLearningObjectsSearchResults);
+            }
+        }
 
         // make search results map with key as learning object id, this is used by the view
-        for (LearningObjectDetailsBean learningObject : mapLearningObjectDetails.values()) {
+        for (LearningObjectDetailsBean learningObject : combinedLearningObjectsSearchResults) {
             // don't show already linked objects in search results
             if (!course.isLearningObjectLinked(learningObject.getId())) {
                 learningObjectsSearchResults.put(learningObject.getId(), learningObject);

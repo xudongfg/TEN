@@ -63,6 +63,8 @@ public interface DaoConstants {
 	public static final String GET_TEXT_SQL = "select FileName, FileType, Content from culturalcontent where Id=?";
 
     public static final String GET_LEARNING_OBJECT_BY_ID = "select FileName, FileType, Content, ContentType, ReferenceId from culturalcontent where Id=?";
+    
+    public static final String GET_LEARNING_OBJECT_BY_FULL_TEXT_SEARCH = "select Id from culturalcontent where match ContentText against (?)";
 	
 	public static final String GET_COURSES_FOR_USER_SQL =
             "select Id, OwnerId, Name, Description, Prerequisites, Topics, Overview, Timeline, IndividualAssignments, GroupAssignemnts, OnsiteAssignments, " +

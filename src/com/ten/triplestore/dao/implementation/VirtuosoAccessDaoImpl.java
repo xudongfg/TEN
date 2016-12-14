@@ -1689,7 +1689,7 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
 		
     	// construct the URL to the Wordnet dictionary directory
     	String path = "C:\\TEN\\workspace\\TribalEducationNetwork\\WebContent\\WNdb-3.0\\dict";
-    	System.out.println ("WNDB path is " + path );
+//    	System.out.println ("WNDB path is " + path );
     	URL url = new URL("file", null , path );
     	// construct the dictionary object and open it
     	IDictionary dict = new Dictionary (url);
@@ -1732,7 +1732,7 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
     	
 //    	Debug: Print out result
     	printWord(keyword_results, "Keyword result: ");
-    	System.out.println("Related words are found: " + keyword_results.size());
+//    	System.out.println("Related words are found: " + keyword_results.size());
 
     	return keyword_results;
     }
@@ -1866,7 +1866,6 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
     	}
     	for(IWordID wid : relatedWords){
     		IWord eachWord = dict.getWord(wid);
-//    		System.out.println(eachWord.getLemma());
     		lexicalRelatedResult.add(eachWord.getLemma());
     	}
     	
@@ -1896,10 +1895,6 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
 			while (st.hasMoreTokens()) {
 				String nextKeyword = st.nextToken().trim();
 				orSearchTerms.add(nextKeyword);
-				orSearchTerms.addAll(testDictionary(nextKeyword));
-//				Test JWI search
-//				printWord(testDictionary(nextKeyword), "Returned Keywords = ");
-//				testDictionary(nextKeyword);
 			}
 			
 //	    	Remove duplicated keywords by converting to set data structure.
@@ -1910,7 +1905,7 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
 //	    	Remove keywords which might be substring of search query
 	    	String forbiddenWords = new String(TripleStoreConstants.URI_IMAGE).toLowerCase();
 	    	System.out.println(forbiddenWords);
-	    	System.out.println("or search term number before remove action: " + tempOrSearchTerms.size());
+//	    	System.out.println("or search term number before remove action: " + tempOrSearchTerms.size());
 	    	for(String w : tempOrSearchTerms){
 	    		if (!forbiddenWords.contains(w.toLowerCase()) && (w.length() > 1)){
 	    			orSearchTerms.add(w);
@@ -1921,7 +1916,7 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
 	    			System.out.println("Forbidden Word: " + w);
 	    		}
 	    	}
-	    	System.out.println("or search term number after remove action: " + orSearchTerms.size());
+//	    	System.out.println("or search term number after remove action: " + orSearchTerms.size());
 //	    	printWord(orSearchTerms, "Keyword left: ");
 			
 			ArrayList<String> andSearchTermsList = new ArrayList<String>();

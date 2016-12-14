@@ -12,6 +12,7 @@ import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
 import com.ten.beans.*;
+
 import model.Permission;
 import model.Role;
 import org.apache.log4j.Logger;
@@ -1396,6 +1397,57 @@ public class DbAccessDaoImpl implements DbAccessDaoInterface{
             log.debug(this.getClass() + DaoConstants.LOG_END + LOG_METHOD_NAME);
         }
         return learningObject;
+    }
+    
+    public HashSet<LearningObjectDetailsBean> getLearningObjectsByFullTextSearch(String keyword) throws Exception {
+    	HashSet<LearningObjectDetailsBean> learningObjects = new HashSet<LearningObjectDetailsBean>();
+    	ArrayList<Integer> learningObjectIds = getLearningObjectIdByFullTextSearch(keyword);
+    	for(int id : learningObjectIds){
+    		learningObjects.add(getLearningObject(id));
+    	}
+    	return learningObjects;
+    }
+    
+    public ArrayList<Integer> getLearningObjectIdByFullTextSearch(String keyword) throws Exception {
+//        String LOG_METHOD_NAME = "LearningObjectDetailsBean getLearningObject(int id)";;
+//        log.debug(this.getClass() + DaoConstants.LOG_BEGIN + LOG_METHOD_NAME);
+    	
+    	ArrayList<Integer> LearningObjectIds = new ArrayList<Integer>();
+
+        // declare a connection by using Connection interface
+        Connection connection = null;
+
+        // Declare prepare statement.
+        PreparedStatement preparedStatement = null;
+
+        // result set
+        ResultSet rset = null;
+
+        try {
+            connection = getConnection();
+            String sql = DaoConstants.GET_LEARNING_OBJECT_BY_FULL_TEXT_SEARCH;
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, keyword);
+            rset = preparedStatement.executeQuery();
+
+            while (rset.next ())
+            {
+            	LearningObjectIds.add(rset.getInt(1));
+            	System.out.println("Learning object id: " + rset.getInt(1));
+            }
+        } catch (Exception ex) {
+            // catch if found any exception during rum time.
+            log.error(ex);
+            throw ex;
+        } finally {
+            // close all the connections.
+            rset.close();
+            connection.close();
+            preparedStatement.close();
+            System.out.println("Connection closed.");
+//            log.debug(this.getClass() + DaoConstants.LOG_END + LOG_METHOD_NAME);
+        }
+        return LearningObjectIds;
     }
 
 	@Override
