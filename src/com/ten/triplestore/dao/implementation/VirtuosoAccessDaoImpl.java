@@ -1800,7 +1800,7 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
 		// look up first sense of the keyword
     	IIndexWord idxWord = dict.getIndexWord(keyword, partOfSpeech);
     	if(idxWord == null){
-    		System.out.println("Cannot find  keyword for part of speech " + partOfSpeech.name());
+//    		System.out.println("Cannot find  keyword for part of speech " + partOfSpeech.name());
     		return null;
     	}
     	IWordID wordID = idxWord.getWordIDs().get(0) ;
@@ -1828,7 +1828,7 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
 		// look up first sense of the keyword
     	IIndexWord idxWord = dict.getIndexWord(keyword, partOfSpeech);
     	if(idxWord == null){
-    		System.out.println("Cannot find  keyword for part of speech " + partOfSpeech.name());
+//    		System.out.println("Cannot find  keyword for part of speech " + partOfSpeech.name());
     		return null;
     	}
     	IWordID wordID = idxWord.getWordIDs().get(0) ;
@@ -1854,14 +1854,14 @@ public HashMap<String, ArrayList<String>> queryRecommendedLearningObjects(Studen
     	// look up lexical related keywords
     	IIndexWord idxWord = dict.getIndexWord(keyword, partOfSpeech);
     	if(idxWord == null){
-    		System.out.println("Cannot find  keyword for part of speech " + partOfSpeech.name());
+//    		System.out.println("Cannot find  keyword for part of speech " + partOfSpeech.name());
     		return null;
     	}
     	IWordID wordID = idxWord.getWordIDs().get(0) ;
     	IWord word = dict.getWord(wordID);
     	List<IWordID> relatedWords = word.getRelatedWords();
     	if(relatedWords.size() == 0){
-    		System.out.println("Cannot find lexical related word for part of speech " + partOfSpeech.name());
+//    		System.out.println("Cannot find lexical related word for part of speech " + partOfSpeech.name());
     		return null;
     	}
     	for(IWordID wid : relatedWords){

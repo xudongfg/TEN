@@ -1426,7 +1426,14 @@ public class DbAccessDaoImpl implements DbAccessDaoInterface{
         ResultSet rset = null;
 
         try {
-        	String search_keyword = keyword + "*";
+//        	If the keyword end with letter or digit, we add asterisk at the end of keyword for wild card search.
+        	String search_keyword = keyword;
+        	char first_char = keyword.charAt(0);
+        	char last_char = keyword.charAt(keyword.length() - 1);
+        	if ((Character.isLetter(first_char) || Character.isDigit(first_char)) && (Character.isLetter(last_char) || Character.isDigit(last_char))){
+        		search_keyword = keyword + "*";
+        	}
+        	
             connection = getConnection();
             String sql = DaoConstants.GET_LEARNING_OBJECT_BY_FULL_TEXT_SEARCH;
             preparedStatement = connection.prepareStatement(sql);
